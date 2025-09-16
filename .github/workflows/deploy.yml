@@ -3,7 +3,7 @@ name: Deploy to CloudBase Static Hosting
 on:
   push:
     branches:
-      - main # 或 master，根据您的主分支名称
+      - lanjiaxie # 或 master，根据您的主分支名称
 
 jobs:
   build-and-deploy:
@@ -27,17 +27,10 @@ jobs:
     - name: Install CloudBase CLI
       run: npm install -g @cloudbase/cli
 
-    - name: Debug - List files in build directory
-      run: ls -la ./dist  # 确认构建目录是否存在以及里面的文件
-
     - name: Deploy to CloudBase Static Hosting
       env:
+        # TCB_SECRET_ID和TCB_SECRET_KEY会自动被CLI识别
         TCB_SECRET_ID: ${{ secrets.TCB_SECRET_ID }}
         TCB_SECRET_KEY: ${{ secrets.TCB_SECRET_KEY }}
       run: |
-        # 输出一些调试信息（注意不要暴露敏感信息）
-        echo "EnvId: ${{ secrets.TCB_ENV_ID }}"
-        echo "Current directory: $(pwd)"
-        echo "Contents of dist: $(ls -la ./dist)"
-        # 执行部署命令
-        tcb hosting deploy ./dist --envId ${{ secrets.TCB_ENV_ID }} --containerPath /
+        tcb hosting deploy ./dist --envId ${{ secrets.TCB_ENV_ID }} --containerPath / # 替换 ./dist 为您的构建输出目录
