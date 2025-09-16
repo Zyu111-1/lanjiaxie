@@ -923,7 +923,7 @@ function initializePatternImages() {
         const placed = [];
         imgs.forEach((img, i) => {
             const el = document.createElement('img');
-            el.src = `pattern/${img}`;
+            el.src = `/lanjiaxie/pattern/${img}`;
             const size = 12 + Math.random() * 8;
             let left, top, tryCount = 0, overlap;
             do {
@@ -1141,3 +1141,4 @@ window.addEventListener('load', function() {
 </body>
 
 </html>
+
