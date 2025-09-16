@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蓝夹缬</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-size: clamp(14px, 2.5vw, 22px);
+            background-color: #001E42;
+        }
+        .container {
+            width: 100vw;
+            height: 400vh; /* 从500vh调整为400vh，因为删除了一页 */
+            position: relative;
+            overflow: hidden;
+        }
+        .pages {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s cubic-bezier(.77,0,.18,1);
+            display: flex;
+            flex-direction: column;
+        }
+        .page {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2em, 4vw, 2.5em);
+            color: #fff;
+            position: relative;
+        }
+        .page1 {
+            background: url('首页/背景.jpg') no-repeat center center;
+            background-size: cover;
+        }
+        .page2 { background: #001E42; }
+        .page3 { background: #001E42; }
+        .page4 { background: #001E42; }
+        .page1 {
+            position: relative;
+            overflow: visible;
+        }
+        #particle-canvas {
+            position: absolute;
+            left: 0; top: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .vertical-typewriter {
+            position: relative;
+            z-index: 1;
+        }
+        .nav-btn {
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+            z-index: 10;
+        }
+        .nav-btn button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+        .fade-in-char {
+            opacity: 0;
+            display: inline-block;
+            animation: fadeInChar 0.7s cubic-bezier(.77,0,.18,1) forwards;
+        }
+
+        @keyframes fadeInChar {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+                filter: blur(2px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+        .vertical-typewriter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* 减小两行文本之间的间距 */
+            gap: 0.5em;
+            writing-mode: horizontal-tb;
+            text-orientation: mixed;
+            /* 调整整体位置，使其更低 */
+            position: relative;
+            top: 20vh;
+        }
+
+        .vertical-typewriter .vertical-text {
+            writing-mode: horizontal-tb; /* 改为水平排列 */
+            text-orientation: mixed;
+            letter-spacing: 0.2em;
+            font-size: clamp(1.2em, 5vw, 3em);
+        }
+        @media (max-width: 400px) {
+            .vertical-typewriter .vertical-text {
+                font-size: 1.1em;
+                letter-spacing: 0.1em;
+            }
+            .page {
+            font-size: 1em;
+            }
+        }
+        .page1 .vertical-text {
+            font-size: clamp(1em, 1.5vw, 1.6em);
+        }
+        #typewriter1-title{
+            position: relative;
+            top: 0;
+            left: 0;
+            margin-bottom: 0.5em;
+        }
+
+        #typewriter1-sub{
+            position: relative;
+            top: 0;
+            right: 0;
+        }
+        #startBtn {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 0;
+        }
+        .pattern-bg {
+            position: absolute;
+            left: 0; top: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .pattern-bg img {
+            position: absolute;
+            opacity: 0.18;
+            pointer-events: none;
+            border-radius: 8vw;
+            transition: opacity 0.5s;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.08));
+        }
+        .page {
+            position: relative;
+            overflow: hidden;
+        }
+        .page4 .showcase {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 90vw;
+            margin: 0 auto;
+            margin-top: 6vh;
+            z-index: 2;
+            position: relative;
+        }
+        .showcase-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-bottom: 2vh;
+            letter-spacing: 0.1em;
+            text-align: center;
+        }
+        .showcase-images {
+            display: flex;
+            justify-content: center;
+            gap: 4vw;
+            margin-bottom: 2vh;
+            width: 100%;
+        }
+        .show-img {
+            width: 26vw;
+            height: 26vw;
+            object-fit: cover;
+            border-radius: 2vw;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            background: #fff2;
+        }
+        .showcase-desc {
+            font-size: 1em;
+            color: #fff;
+            margin-top: 2vh;
+            text-align: start;
+            line-height: 1.6;
+            padding: 0 2vw;
+        }
+        .back-btn {
+            position: absolute;
+            left: 4vw;
+            top: 4vw;
+            z-index: 10;
+            background: rgba(0,30,66,0.7);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 10vw;
+            height: 10vw;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            transition: background 0.2s;
+        }
+        .back-btn:active {
+            background: rgba(0,30,66,1);
+        }
+        .page3 .select-area {
+            width: 90vw;
+            margin: 0 auto;
+            margin-top: 8vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+            position: relative;
+        }
+        .page3-description {
+            position: absolute;
+            top: 6vh;
+            left: 8vw;
+            font-size: clamp(12px, 1.8vw, 16px);
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 35vw;
+            line-height: 1.5;
+            z-index: 15;
+            text-align: left;
+        }
+        
+        @media (max-width: 768px) {
+            .page3-description {
+                max-width: 45vw;
+                font-size: clamp(10px, 2vw, 14px);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page3-description {
+                max-width: 50vw;
+                font-size: clamp(9px, 2.2vw, 12px);
+                top: 1vh;
+                left: 1vw;
+            }
+        }
+        .select-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 3vh;
+            text-align: center;
+        }
+        .select-current-title {
+            position: absolute;
+            top: -5vh;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 0.1em;
+            z-index: 20;
+            opacity: 0;
+            filter: brightness(2) drop-shadow(0 0 12px #fff8);
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        
+        @keyframes titleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+                filter: brightness(3) blur(2px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+                filter: brightness(2) blur(0);
+            }
+        }
+        
+        .select-current-title.fade-in {
+            animation: titleFadeIn 1.2s cubic-bezier(.77,0,.18,1) forwards;
+        }
+        .select-current-title.visible {
+            opacity: 1;
+            animation: fadeInHighlight 1.2s cubic-bezier(.77,0,.18,1);
+        }
+        @keyframes fadeInHighlight {
+            0% { opacity: 0; filter: brightness(3) blur(2px);}
+            60% { opacity: 1; filter: brightness(2.5) blur(0);}
+            100% { opacity: 1; filter: brightness(1.5) blur(0);}
+        }
+        .select-options {
+            position: relative;
+            width: 100vw;
+            height: 60vw;
+            margin: 0 auto;
+            margin-top: 4vh;
+            margin-bottom: 2vh;
+        }
+        .select-img-btn {
+            position: absolute;
+            cursor: pointer;
+            transition: 
+                box-shadow 0.3s,
+                filter 0.3s,
+                transform 0.3s,
+                opacity 0.3s;
+            opacity: 1;
+            filter: brightness(0.9) saturate(0.8);
+            z-index: 10;
+        }   
+        .page3-mask {
+            position: absolute;
+            left: 0; top: -100vh;
+            width: 100vw;
+            height: 300vh;
+            background: rgba(0,0,0,0.55);
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .page3-mask.active {
+            opacity: 1;
+        }
+        .select-img-btn.highlight,
+        .select-img-btn:hover,
+        .select-img-btn:active {
+            opacity: 1;
+            filter: brightness(1.2) saturate(1.2) drop-shadow(0 0 12px #fff8);
+            transform: scale(1.12);
+            z-index: 3;
+        }
+        .select-img-btn:nth-child(1) {
+            left: -5vw; bottom: -50vw; width: 38vw; height: 40vw;
+            z-index: 3;
+            transform:rotate(2deg);
+        }
+        .select-img-btn:nth-child(1).highlight,
+        .select-img-btn:nth-child(1):hover,
+        .select-img-btn:nth-child(1):active {
+            transform:rotate(2deg) scale(1.12);
+        }
+        .select-img-btn:nth-child(2) {
+            left: 28vw; bottom: 6vw; width: 24vw; height: 30vw;
+            z-index: 3;
+            transform: rotate(90deg);
+        }
+        .select-img-btn:nth-child(2).highlight,
+        .select-img-btn:nth-child(2):hover,
+        .select-img-btn:nth-child(2):active {
+            transform: rotate(90deg) scale(1.12);
+        }
+        .select-img-btn:nth-child(3) {
+            left: -2.5vw; bottom: 28vw; width: 38vw; height: 38vw;
+            z-index: 4;
+            transform: scaleX(-1) rotate(-60deg);
+        }
+        .select-img-btn:nth-child(3).highlight,
+        .select-img-btn:nth-child(3):hover,
+        .select-img-btn:nth-child(3):active {
+            transform: scaleX(-1) rotate(-60deg) scale(1.12);
+        }
+        .select-img-btn:nth-child(4) {
+            left: 20vw; bottom: -50vw; width: 58vw; height: 56vw;
+            z-index: 2;
+        }
+        .select-img-btn:nth-child(5) {
+            left: 60vw; bottom: -50vw; width: 40vw; height: 130vw;
+            z-index: 3;
+        }
+        .select-current-title.fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        /* 首页按钮样式 */
+        .page1-buttons {
+            position: absolute;
+            bottom: 18vh; /* 位置更高 */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 4vw;
+            z-index: 8;
+        }
+        
+        .page1-btn {
+            background: transparent;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            /* 增大按钮尺寸 */
+            width: 25vw;
+            height: auto;
+        }
+        
+        .page1-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .page1-btn:active {
+            transform: scale(0.95);
+        }
+        
+        #patternIntroBtn {
+            width: 25vw;
+            height: auto;
+        }
+        
+        #enterExhibitionBtn {
+            width: 25vw;
+            height: auto;
+        }
+        
+        /* 加载页面样式 */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #001E42;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+        
+        /* 第二页文本样式 */
+        .page2-content {
+            width: 80vw;
+            max-width: 800px;
+            text-align: center;
+            font-size: clamp(14px, 2vw, 18px);
+            line-height: 1.8;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .page2-content p {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .page2-content .dynasty {
+            font-weight: bold;
+            color: #4d9de0;
+            display: block;
+            margin-top: 15px;
+        }
+
+        /* 第二页文本动画效果 */
+        .page2-fade-in-char {
+            opacity: 0;
+            display: inline-block;
+            animation: page2FadeInChar 0.4s cubic-bezier(.77,0,.18,1) forwards;
+        }
+
+        @keyframes page2FadeInChar {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.95);
+                filter: blur(1px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- 添加加载页面 -->
+    <div id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p style="color: white; font-size: 1.5em; margin-top: 20px;">加载中...</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="pages" id="pages">
+            
+        <div class="page page1">
+            <img src="首页/首页背景.jpg" id="startBtn">
+            <div class="pattern-bg"></div>
+            <canvas id="particle-canvas"></canvas>
+            <div class="vertical-typewriter">
+                <span id="typewriter1-title" class="vertical-text"></span>
+                <span id="typewriter1-sub" class="vertical-text"></span>
+            </div>  
+            <div class="page1-buttons">
+                <img class="page1-btn" id="patternIntroBtn" src="首页/纹样介绍.png" alt="纹样介绍">
+                <img class="page1-btn" id="enterExhibitionBtn" src="首页/进入展厅.png" alt="进入展厅">
+            </div>
+        </div>
+        <div class="page page2">
+            <div class="pattern-bg"></div>
+            <canvas id="particle-canvas"></canvas>
+            <div class="page2-content">
+                <div id="page2Text1"></div>
+                <div id="page2Text2"></div>
+            </div>
+        </div>
+        <div class="page page3">
+            <div class="pattern-bg"></div>
+            <canvas id="particle-canvas"></canvas>
+            <div class="page3-mask" id="page3Mask"></div>
+            <div class="page3-description">
+                浙南蓝夹缬被面的写样工具，是手工艺人有意识或无意识地运用浙南蓝夹缬这一语境下符号学编码规则的过程，无论是被面上的神话传说人物还是动物花草，无不承载着或传达着某种寓意或祝福。
+            </div>
+            <div class="select-area">
+                <div class="select-current-title" id="selectCurrentTitle">各式纹样</div>
+                <div class="road">
+                    <img src="background/湖.png" style="width: 130vw; height:103vw; position: absolute; bottom: -10vh; left: -13vw; opacity: 0.5; pointer-events: none;">
+                    <img src="background/路.png" style="width: 103vw; position: absolute; bottom: -32vh; left: -5vw; opacity: 0.5; pointer-events: none;">
+                    <img src="background/云.png" style="width: 85vw; height:76vw; position: absolute; bottom: 50vh; left: 30vw; opacity: 0.5; pointer-events: none;"></img>
+                </div>
+                <div class="select-options">
+                    <img class="select-img-btn" src="btn/花瓶.png"
+                        data-title="生活用具类"
+                        data-img1="pattern/双龙戏珠.jpg"
+                        data-img2="pattern/花瓶.jpg"
+                        data-img3="pattern/灯彩.jpg"
+                        data-desc="生活用具类纹样主要可分为两大主题：一是象征文人雅士才情与修养的“琴棋书画”，图案中常出现古琴、围棋、书卷、画卷等元素，体现了对高雅艺术的追求；二是充满民间生活情趣的“灯彩”，如寓意前途光明的宫灯、象征多子多福的西瓜灯等。这两类图案将文人的精神世界与百姓的世俗愿景巧妙结合。"
+                    alt="花瓶">
+                    <img class="select-img-btn" src="btn/鲤鱼.png"
+                        data-title="动物类"
+                        data-img1="pattern/喜上枝头.jpg"
+                        data-img2="pattern/马到成功.jpg"
+                        data-img3="pattern/鲤鱼跃龙门.jpg"
+                        data-desc="动物类纹样主要可分为四大类：其一为神话传说中的神兽，如龙、麒麟，象征着无上权力与祥瑞；其二为寓意吉祥的瑞兽，如鹿、鹤，代表长寿与福禄；其三为寄托美好愿望的祥禽，如喜鹊、鸳鸯，寓意喜事临门与夫妻恩爱；其四为常见的鱼虫，如鲤鱼、蝴蝶，隐喻多子多福与生命蜕变。这些生灵在靛蓝底布上栩栩如生。"
+                    alt="鲤鱼">
+                    <img class="select-img-btn" src="btn/小鸟.png"
+                        data-title="动物类"
+                        data-img1="pattern/喜上枝头.jpg"
+                        data-img2="pattern/马到成功.jpg"
+                        data-img3="pattern/鲤鱼跃龙门.jpg"
+                        data-desc="动物类纹样主要可分为四大类：其一为神话传说中的神兽，如龙、麒麟，象征着无上权力与祥瑞；其二为寓意吉祥的瑞兽，如鹿、鹤，代表长寿与福禄；其三为寄托美好愿望的祥禽，如喜鹊、鸳鸯，寓意喜事临门与夫妻恩爱；其四为常见的鱼虫，如鲤鱼、蝴蝶，隐喻多子多福与生命蜕变。这些生灵在靛蓝底布上栩栩如生。"
+                    alt="小鸟">
+                    <img class="select-img-btn" src="btn/婴孩.png"
+                        data-title="人物类"
+                        data-img1="pattern/婴戏.png"
+                        data-img2="pattern/和合图.jpg"
+                        data-img3="pattern/多子多福.jpg"
+                        data-desc="人物类纹样主要可分为三大主题：其一为活泼可爱的“婴戏图”，孩童嬉戏于花间庭园，寓意连生贵子、人丁兴旺；其二为取材自民间传奇的“戏曲故事”，如《白兔记》、《拜月亭》等，方寸之间演绎悲欢离合；其三为具有鲜明时代印记的“工农兵”形象，反映了特定历史时期的生产建设与集体主义精神。"
+                    alt="婴孩">
+                    <img class="select-img-btn" src="btn/竹子.png"
+                        data-title="植物类"
+                        data-img1="pattern/竹子.jpg"
+                        data-img2="pattern/柳树.jpg"
+                        data-img3="pattern/石榴.jpg"
+                        data-desc="植物类图案内容丰富，主要可分为三大类：一是象征多子多福的瓜果纹，如石榴、桃子；二是寓意吉祥富贵的花卉纹，常见牡丹、莲花等；三是代表长青与风骨的树木纹，如松竹。这些源于自然的元素，通过传统工艺被生动地印制在蓝白相间的布料上，不仅展现了精湛的技艺，更承载了人们祈求美好生活的深厚文化内涵与审美情趣。"
+                    alt="竹子">
+                </div>
+            </div>
+        </div>
+        <div class="page page4">
+            <div class="pattern-bg"></div>
+            <canvas id="particle-canvas"></canvas>
+            <button class="back-btn" id="backToPage3" title="返回">&#8592;</button>
+            <div class="showcase">
+                <div class="showcase-title" id="showcaseTitle">展示标题</div>
+                <div class="showcase-images">
+                    <img src="pattern/1.jpg" class="show-img" id="showImg1" alt="展示1">
+                    <img src="pattern/2.jpg" class="show-img" id="showImg2" alt="展示2">
+                    <img src="pattern/3.jpg" class="show-img" id="showImg3" alt="展示3">
+                </div>
+                <div class="showcase-desc" id="showcaseDesc">
+                    这里是展示区的文字介绍。内容由第三页选择决定。
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+const pages = document.getElementById('pages');
+const totalPages = 4; // 从5调整为4
+let currentPage = 0;
+let backgroundInitialized = false;
+
+const typewriterTexts = [
+    ['今设此展，','盼君踏入这蓝白之境'],
+    '',
+    '蓝夹缬·第三页',
+    '蓝夹缬·第四页'
+];
+
+const typewriterPlayed = Array(totalPages).fill(false);
+
+let page3HighlightPlayed = false;
+let page3FirstEnter = true;
+
+        function updatePage() {
+            pages.style.transform = `translateY(-${currentPage * 100}vh)`;
+            showTypewriter(currentPage);
+
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn && !startBtn.parentElement.classList.contains('page1')) {
+                const page1 = document.querySelector('.page1');
+                if (page1 && !page1.contains(startBtn)) {
+                    page1.insertBefore(startBtn, page1.firstChild);
+                }
+            }
+            if (currentPage === 2) { // 从3调整为2
+                if (page3FirstEnter) {
+                    const imgs = document.querySelectorAll('.page3 .select-img-btn');
+                    imgs.forEach((img, idx) => {
+                        setTimeout(() => {
+                            img.classList.add('highlight');
+                            setTimeout(() => {
+                                if (img.dataset.activated !== '1') img.classList.remove('highlight');
+                            }, 1000);
+                        }, 200 + idx * 120);
+                    });
+                    page3FirstEnter = false;
+                }
+                const mask = document.getElementById('page3Mask');
+                if (mask) {
+                    mask.classList.remove('active');
+                    setTimeout(() => {
+                        mask.classList.add('active');
+                    }, 1200);
+                }
+                
+                const selectCurrentTitle = document.getElementById('selectCurrentTitle');
+                if (selectCurrentTitle) {
+                    selectCurrentTitle.textContent = '各式纹样';
+                    selectCurrentTitle.classList.remove('visible', 'fade-out', 'fade-in');
+                    void selectCurrentTitle.offsetWidth;
+                    selectCurrentTitle.classList.add('fade-in');
+                }
+            } else {
+                const mask = document.getElementById('page3Mask');
+                if (mask) mask.classList.remove('active');
+                
+                const selectCurrentTitle = document.getElementById('selectCurrentTitle');
+                if (selectCurrentTitle) {
+                    selectCurrentTitle.classList.add('fade-out');
+                }
+            }
+            
+            if (currentPage === 3) { // 从4调整为3
+                document.querySelectorAll('.select-img-btn').forEach(btn => {
+                    btn.classList.remove('highlight');
+                    btn.dataset.activated = '0';
+                });
+                const selectCurrentTitle = document.getElementById('selectCurrentTitle');
+                if (selectCurrentTitle) {
+                    selectCurrentTitle.classList.add('fade-out');
+                }
+            }
+        }
+function nextPage() {
+    if (currentPage < totalPages - 1 && currentPage !== 2) { // 从3调整为2
+        currentPage++;
+        updatePage();
+    }
+}
+
+function prevPage() {
+    if (currentPage > 0) {
+        currentPage--;
+        updatePage();
+    }
+}
+
+window.addEventListener('wheel', (e) => {
+    if (e.deltaY > 0) {
+        if (currentPage !== 2) nextPage(); // 从3调整为2
+    } else if (e.deltaY < 0) {
+        prevPage();
+    }
+});
+
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') {
+        if (currentPage !== 2) nextPage(); // 从3调整为2
+    } else if (e.key === 'ArrowUp') {
+        prevPage();
+    }
+});
+
+let startY = 0;
+let endY = 0;
+
+pages.addEventListener('touchstart', function(e) {
+    startY = e.touches[0].clientY;
+}, {passive: true});
+
+pages.addEventListener('touchend', function(e) {
+    endY = e.changedTouches[0].clientY;
+    let deltaY = endY - startY;
+    if (Math.abs(deltaY) > 50) {
+        if (deltaY < 0 && currentPage !== 2) nextPage(); // 从3调整为2
+        else if (deltaY > 0) prevPage();
+    }
+}, {passive: true});
+
+let page2TextPlayed = false;
+
+function showPage2Text() {
+    if (page2TextPlayed) return;
+    
+    const text1Element = document.getElementById('page2Text1');
+    const text2Element = document.getElementById('page2Text2');
+    
+    // 第二页的文本内容
+    const text1 = '据古籍记载，夹缬的起源可追溯至秦汉，宋代高承编述的著作《事物纪原》曾引述唐人袁郊《二仪实录》所言称夹缬"秦汉间有之，不知为何人造"，夹缬产于秦汉，但其具体发明者已无从考证，梁陈时代的夹缬则推广至各阶层人士。';
+    const text2 = '五代的马缟曾在《裙衬裙》著作提到"隋大业中，炀帝制五色夹花罗裙以赐官人及傺母、妻"，这句话所诉的便是在隋炀帝时期已有夹缬花罗裙出现，隋炀帝曾特意令工匠们印染五彩夹缬花罗裙，赏赐给宫女和百官妻女。';
+    
+    // 创建带动画的文本1
+    for (let i = 0; i < text1.length; i++) {
+        const span = document.createElement('span');
+        span.textContent = text1[i];
+        span.className = 'page2-fade-in-char';
+        span.style.animationDelay = (i * 0.05) + 's'; // 更快的动画速度
+        text1Element.appendChild(span);
+    }
+    
+    // 添加朝代标签
+    const dynasty1 = document.createElement('span');
+    dynasty1.textContent = '（秦汉）';
+    dynasty1.className = 'page2-fade-in-char dynasty';
+    dynasty1.style.animationDelay = (text1.length * 0.05) + 's';
+    text1Element.appendChild(dynasty1);
+    
+    // 创建带动画的文本2
+    for (let i = 0; i < text2.length; i++) {
+        const span = document.createElement('span');
+        span.textContent = text2[i];
+        span.className = 'page2-fade-in-char';
+        span.style.animationDelay = ((text1.length + 10 + i) * 0.05) + 's'; // 更快的动画速度
+        text2Element.appendChild(span);
+    }
+    
+    // 添加朝代标签
+    const dynasty2 = document.createElement('span');
+    dynasty2.textContent = '（隋朝）';
+    dynasty2.className = 'page2-fade-in-char dynasty';
+    dynasty2.style.animationDelay = ((text1.length + text2.length + 20) * 0.05) + 's';
+    text2Element.appendChild(dynasty2);
+    
+    page2TextPlayed = true;
+}
+
+// 修改showTypewriter函数
+function showTypewriter(pageIndex) {
+    if (pageIndex === 0) {
+        const titleElem = document.getElementById('typewriter1-title');
+        const subElem = document.getElementById('typewriter1-sub');
+        if (!typewriterPlayed[0]) {
+            titleElem.innerHTML = '';
+            subElem.innerHTML = '';
+            const [title, sub] = typewriterTexts[0];
+            for (let i = 0; i < title.length; i++) {
+                const span = document.createElement('span');
+                span.textContent = title[i];
+                span.className = 'fade-in-char';
+                span.style.animationDelay = (i * 0.18) + 's';
+                titleElem.appendChild(span);
+            }
+            for (let i = 0; i < sub.length; i++) {
+                const span = document.createElement('span');
+                span.textContent = sub[i];
+                span.className = 'fade-in-char';
+                span.style.animationDelay = ((title.length + i) * 0.18) + 's';
+                subElem.appendChild(span);
+            }
+            typewriterPlayed[0] = true;
+        }
+        return;
+    }
+    
+    // 处理第二页文本动画
+    if (pageIndex === 1) {
+        showPage2Text();
+        return;
+    }
+    
+    const typewriterElem = document.getElementById('typewriter' + (pageIndex + 1));
+    const text = typewriterTexts[pageIndex];
+    if (!typewriterElem) return;
+    if (typewriterPlayed[pageIndex]) return;
+    for (let i = 0; i < text.length; i++) {
+        const span = document.createElement('span');
+        span.textContent = text[i];
+        span.className = 'fade-in-char';
+        span.style.animationDelay = (i * 0.18) + 's';
+        typewriterElem.appendChild(span);
+    }
+    typewriterPlayed[pageIndex] = true;
+}
+
+function createParticles(canvas, num = 25) {
+    if (!canvas || canvas.particlesInitialized) return; // 避免重复初始化
+    
+    let dpr = window.devicePixelRatio || 1;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const ctx = canvas.getContext('2d');
+    const PARTICLE_NUM = num;
+    const particles = [];
+    for (let i = 0; i < PARTICLE_NUM; i++) {
+        particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            r: 1.5 + Math.random() * 2.5,
+            alpha: Math.random(),
+            speed: 0.2 + Math.random() * 0.4,
+            phase: Math.random() * Math.PI * 2
+        });
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let p of particles) {
+            p.alpha = 0.2 + 0.6 * Math.abs(Math.sin(Date.now() / 700 + p.phase));
+            p.x += (Math.random() - 0.5) * p.speed;
+            p.y += (Math.random() - 0.5) * p.speed;
+            if (p.x < 0) p.x = width;
+            if (p.x > width) p.x = 0;
+            if (p.y < 0) p.y = height;
+            if (p.y > height) p.y = 0;
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            ctx.beginPath();
+            ctx.arc(p.x * dpr, p.y * dpr, p.r * dpr, 0, Math.PI * 2);
+            ctx.fillStyle = "#fff";
+            ctx.shadowColor = "#fff";
+            ctx.shadowBlur = 8 * dpr;
+            ctx.fill();
+            ctx.restore();
+        }
+        requestAnimationFrame(draw);
+    }
+    draw();
+    canvas.particlesInitialized = true; // 标记已初始化
+}
+
+const patternImages = [
+    "1.jpg", "不对称纹样.jpg", "蝶戏牡丹.jpg", "对称纹样.jpg", "多子多福.jpg", "凤戏牡丹.jpg",
+    "佛手.jpg", "富贵牡丹.jpg", "和合图.jpg", "鹤衔灵芝.jpg", "鲤鱼跃龙门.jpg", "柳树.jpg",
+    "马到成功.jpg", "苹果新Logo，这很温州💁_♂️_2_GrayDesign_来自小红书网页版.jpg", "麒麟送子.jpg",
+    "石榴.jpg", "柿子.jpg", "寿鹿衔芝.jpg", "双菊图.jpg", "双莲图.jpg", "双龙戏珠.jpg",
+    "松树.jpg", "太平有象.jpg", "舞灯图.jpg", "喜上眉梢.jpg", "喜上枝头.jpg", "游乐图.jpg",
+    "玉兔逢春.jpg", "竹子.jpg", "bag1.jpg"
+];
+
+const PATTERN_PER_PAGE = 5;
+const minPos = 5;
+const maxPos = 85;
+
+function isOverlap(a, b) {
+    return !(
+        a.left + a.size < b.left ||
+        b.left + b.size < a.left ||
+        a.top + a.size < b.top ||
+        b.top + b.size < a.top
+    );
+}
+
+// 将装饰图案生成代码提取为独立函数
+function initializePatternImages() {
+    document.querySelectorAll('.pattern-bg').forEach(bg => {
+        // 清空现有的装饰图案
+        bg.innerHTML = '';
+        
+        const imgs = patternImages.slice().sort(() => Math.random() - 0.5).slice(0, PATTERN_PER_PAGE);
+        const placed = [];
+        imgs.forEach((img, i) => {
+            const el = document.createElement('img');
+            el.src = `pattern/${img}`;
+            const size = 12 + Math.random() * 8;
+            let left, top, tryCount = 0, overlap;
+            do {
+                left = minPos + Math.random() * (maxPos - size - minPos);
+                top = minPos + Math.random() * (maxPos - size - minPos);
+                overlap = placed.some(p => isOverlap(
+                    {left, top, size},
+                    p
+                ));
+                tryCount++;
+            } while (overlap && tryCount < 30);
+            el.style.width = `${size}vw`;
+            el.style.height = 'auto';
+            el.style.left = `${left}vw`;
+            el.style.top = `${top}vh`;
+            el.style.transform = `rotate(${Math.random() * 360}deg)`;
+            el.style.zIndex = i;
+            placed.push({left, top, size});
+            bg.appendChild(el);
+        });
+    });
+}
+
+document.querySelectorAll('.select-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('showcaseTitle').textContent = btn.dataset.title;
+        document.getElementById('showImg1').src = btn.dataset.img1;
+        document.getElementById('showImg2').src = btn.dataset.img2;
+        document.getElementById('showImg3').src = btn.dataset.img3;
+        document.getElementById('showcaseDesc').textContent = btn.dataset.desc;
+        currentPage = 3; // 从4调整为3
+        updatePage();
+    });
+});
+
+const backBtn = document.getElementById('backToPage3'); // 从backToPage4改为backToPage3
+if (backBtn) {
+    backBtn.addEventListener('click', function() {
+        currentPage = 2; // 从3调整为2
+        updatePage();
+    });
+}
+
+document.querySelectorAll('.select-img-btn').forEach(btn => {
+    btn.dataset.activated = '0';
+
+    btn.addEventListener('mouseenter', function() {
+        if (btn.dataset.activated !== '1') btn.classList.add('highlight');
+    });
+    btn.addEventListener('mouseleave', function() {
+        if (btn.dataset.activated !== '1') btn.classList.remove('highlight');
+    });
+    btn.addEventListener('touchstart', function() {
+        if (btn.dataset.activated !== '1') btn.classList.add('highlight');
+    });
+    btn.addEventListener('touchend', function() {
+        if (btn.dataset.activated !== '1') btn.classList.remove('highlight');
+    });
+
+    btn.addEventListener('click', function(e) {
+        if (btn.dataset.activated === '1') {
+            document.getElementById('showcaseTitle').textContent = btn.dataset.title;
+            document.getElementById('showImg1').src = btn.dataset.img1;
+            document.getElementById('showImg2').src = btn.dataset.img2;
+            document.getElementById('showImg3').src = btn.dataset.img3;
+            document.getElementById('showcaseDesc').textContent = btn.dataset.desc;
+            currentPage = 3; // 从4调整为3
+            updatePage();
+            btn.dataset.activated = '0';
+            btn.classList.remove('highlight');
+        } else {
+            document.querySelectorAll('.select-img-btn').forEach(other => {
+                if (other !== btn) {
+                    other.classList.remove('highlight');
+                    other.dataset.activated = '0';
+                }
+            });
+            btn.classList.add('highlight');
+            btn.dataset.activated = '1';
+
+            const selectCurrentTitle = document.getElementById('selectCurrentTitle');
+            if (selectCurrentTitle) {
+                selectCurrentTitle.textContent = btn.dataset.title;
+                selectCurrentTitle.classList.remove('visible');
+                void selectCurrentTitle.offsetWidth;
+                selectCurrentTitle.classList.add('visible');
+            }
+        }
+    });
+});
+
+// 预加载背景图片
+function preloadBackgroundImages() {
+    const backgroundImages = [
+        '首页/背景.jpg',
+        'background/湖.png',
+        'background/路.png',
+        'background/云.png'
+    ];
+    
+    let loadedCount = 0;
+    const totalImages = backgroundImages.length;
+    
+    return new Promise((resolve) => {
+        backgroundImages.forEach(src => {
+            const img = new Image();
+            img.onload = img.onerror = function() {
+                loadedCount++;
+                if (loadedCount >= totalImages) {
+                    resolve();
+                }
+            };
+            img.src = src;
+        });
+        
+        // 如果5秒后仍未加载完成，也继续执行
+        setTimeout(() => {
+            resolve();
+        }, 5000);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 预加载关键资源
+    const preloadImages = [
+        '首页/首页背景.jpg',
+        '首页/纹样介绍.png',
+        '首页/进入展厅.png',
+        'btn/花瓶.png',
+        'btn/鲤鱼.png',
+        'btn/小鸟.png',
+        'btn/婴孩.png',
+        'btn/竹子.png'
+    ];
+    
+    let loadedCount = 0;
+    const totalImages = preloadImages.length;
+    
+    // 创建图片预加载器
+    preloadImages.forEach(src => {
+        const img = new Image();
+        img.onload = img.onerror = function() {
+            loadedCount++;
+            if (loadedCount >= totalImages) {
+                // 所有图片加载完成后隐藏加载页面
+                hideLoadingScreen();
+            }
+        };
+        img.src = src;
+    });
+    
+    // 如果5秒后仍未加载完成，也隐藏加载页面
+    setTimeout(() => {
+        hideLoadingScreen();
+    }, 5000);
+    
+    function hideLoadingScreen() {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                // 初始化背景元素
+                initializeBackground();
+            }, 500);
+        }
+    }
+    
+    // 添加初始化背景的函数
+    function initializeBackground() {
+        // 初始化粒子效果
+        initializeParticles();
+        
+        // 初始化装饰图案（只执行一次）
+        if (!backgroundInitialized) {
+            initializePatternImages();
+            backgroundInitialized = true;
+        }
+        
+        showTypewriter(0);
+    }
+    
+    // 修改初始化粒子效果函数
+    function initializeParticles() {
+        // 只初始化一次粒子效果
+        if (!backgroundInitialized) {
+            createParticles(document.querySelector('.page1 #particle-canvas'), 25);
+            createParticles(document.querySelector('.page2 #particle-canvas'), 25);
+            createParticles(document.querySelector('.page3 #particle-canvas'), 25);
+            createParticles(document.querySelector('.page4 #particle-canvas'), 25);
+        }
+    }
+    
+    const patternIntroBtn = document.getElementById('patternIntroBtn');
+    if (patternIntroBtn) {
+        patternIntroBtn.addEventListener('click', function() {
+            currentPage = 1;
+            updatePage();
+        });
+    }
+    
+    const enterExhibitionBtn = document.getElementById('enterExhibitionBtn');
+    if (enterExhibitionBtn) {
+        enterExhibitionBtn.addEventListener('click', function() {
+            window.open('https://www.720yun.com/t/8eakue7ysf7', '_blank');
+        });
+    }
+});
+
+// 在页面加载时预加载背景图片
+window.addEventListener('load', function() {
+    preloadBackgroundImages();
+});
+</script>
+</body>
+</html>
